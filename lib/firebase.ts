@@ -1,5 +1,6 @@
-import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth"; // 🚩 IMPORTANTE
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getFirestore } from "firebase/firestore"; // Importar Firestore
 
 const firebaseConfig = {
   apiKey: "AIzaSyDlfyIiNhws0F5Z0cIhEULCcHD8r7Vx8c4",
@@ -10,9 +11,9 @@ const firebaseConfig = {
   appId: "1:990980476093:web:a2dece4d2e88c773edfbd4"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Singleton: Evita que Firebase se inicialice 2 veces (causa común de errores)
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-// LOGIN
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
+export const db = getFirestore(app); // Exportar la Base de Datos

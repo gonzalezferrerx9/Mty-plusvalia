@@ -5,12 +5,12 @@ import MapComponent from '../components/MapComponent';
 import TutorialGuide from '../components/TutorialGuide';
 import HistoryChat from '../components/HistoryChat';
 
-// --- FIREBASE IMPORTS (NUEVO) ---
-import { auth, googleProvider } from '../lib/firebase';
+// --- FIREBASE IMPORTS ---
+import { auth, googleProvider, db } from '../lib/firebase'; // 🚩 Agregamos db
 import { signInWithPopup, signOut, onAuthStateChanged, User } from 'firebase/auth';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; // 🚩 Para guardar
 
-// --- UI COMPONENTS ---
-
+// --- UI COMPONENTS (LoadingOverlay y AnalysisResultCard se mantienen igual) ---
 const LoadingOverlay = () => (
   <div className="absolute inset-0 z-50 bg-black/40 backdrop-blur-sm flex flex-col items-center justify-center text-white animate-in fade-in duration-300">
     <div className="bg-white/10 p-6 rounded-2xl border-l-4 border-t-4 border-r-[8px] border-b-[8px] border-white/20 backdrop-blur-md flex flex-col items-center">
@@ -23,30 +23,22 @@ const LoadingOverlay = () => (
   </div>
 );
 
-// --- NEW FLOATING RESULT CARD ---
 const AnalysisResultCard = ({ data, onClose }: { data: any, onClose: () => void }) => {
   if (!data) return null;
-
   return (
     <div className="absolute top-20 right-4 w-[400px] max-w-[90vw] max-h-[80vh] bg-white rounded-xl overflow-hidden flex flex-col animate-in slide-in-from-right-10 duration-500 z-30 border-l-4 border-t-4 border-r-[12px] border-b-[12px] border-slate-900">
-        
-        {/* Content Area */}
         <div className="p-5 overflow-y-auto flex-1 custom-scrollbar relative">
-            
-            {/* Close Button */}
             <button 
                 onClick={onClose}
                 className="absolute top-2 right-2 text-slate-400 hover:text-slate-900 transition-colors"
             >
                 ✕
             </button>
-
             <div className="mb-4">
                  <span className="inline-block bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider border-l-2 border-t-2 border-r-4 border-b-4 border-blue-900">
                     {data.recomendacion_negocio?.giro || "Business"}
                 </span>
             </div>
-
             <div className="flex justify-between items-end mb-2">
                 <h2 className="text-xl font-bold leading-tight text-slate-900 w-2/3">{data.zona_nombre}</h2>
                 <div className="text-right">
@@ -54,12 +46,9 @@ const AnalysisResultCard = ({ data, onClose }: { data: any, onClose: () => void 
                     <span className="text-[10px] font-bold text-gray-400">SCORE</span>
                 </div>
             </div>
-            
             <p className="text-xs text-gray-600 leading-relaxed mb-6 border-l-4 border-blue-500 pl-3 text-justify">
                 {data.recomendacion_negocio?.justificacion || "No justification available."}
             </p>
-
-            {/* Stats Grid */}
             <div className="grid grid-cols-2 gap-3 mb-6">
                 <div className="bg-slate-50 p-3 rounded-lg border-l-2 border-t-2 border-r-4 border-b-4 border-slate-200">
                     <span className="text-[9px] text-gray-400 uppercase block mb-1">Avg. Cost per m2</span>
@@ -72,30 +61,25 @@ const AnalysisResultCard = ({ data, onClose }: { data: any, onClose: () => void 
                     <span className="font-bold text-sm text-green-600">{data.finanzas?.roi_retorno || "N/A"}</span>
                 </div>
             </div>
-
-            {/* Details */}
             <div className="space-y-4 mb-6">
                 <div>
                     <h4 className="font-bold text-xs uppercase mb-2 text-slate-400 tracking-wider">Analysis</h4>
                     <p className="text-xs text-slate-600 leading-relaxed mb-2 text-justify">{data.analisis_demografico}</p>
                     <p className="text-xs text-slate-500 italic bg-slate-50 p-2 rounded border-l-2 border-t-2 border-r-4 border-b-4 border-slate-100">"{data.analisis_competencia}"</p>
                 </div>
-                
                 <div className="grid grid-cols-1 gap-2">
-                     {data.pros?.slice(0,2).map((p:string, i:number) => (
-                         <div key={i} className="flex gap-2 items-start text-xs text-slate-600">
+                      {data.pros?.slice(0,2).map((p:string, i:number) => (
+                          <div key={i} className="flex gap-2 items-start text-xs text-slate-600">
                              <span className="text-green-500 font-bold mt-0.5">✓</span>{p}
-                         </div>
-                     ))}
-                     {data.contras?.slice(0,1).map((c:string, i:number) => (
-                         <div key={i} className="flex gap-2 items-start text-xs text-slate-600">
+                          </div>
+                      ))}
+                      {data.contras?.slice(0,1).map((c:string, i:number) => (
+                          <div key={i} className="flex gap-2 items-start text-xs text-slate-600">
                              <span className="text-red-400 font-bold mt-0.5">⚠</span>{c}
-                         </div>
-                     ))}
+                          </div>
+                      ))}
                 </div>
             </div>
-
-            {/* DISCLAIMER */}
             <div className="border-t-2 border-slate-100 pt-4 text-center">
                  <p className="text-[9px] text-slate-400 font-mono tracking-tight">
                     Google Cloud Architect Project • Powered by Gemini <br/>
@@ -122,22 +106,22 @@ export default function Home() {
   const [mapType, setMapType] = useState('roadmap'); 
   const [showConfig, setShowConfig] = useState(false); 
 
-  // --- AUTH STATE (NUEVO) ---
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-      // Escuchar cambios en la autenticación
       const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
           setUser(currentUser);
       });
       return () => unsubscribe();
   }, []);
 
-  const handleLogin = async () => {
+  const handleLogin = async (e?: React.MouseEvent) => {
+      if (e) e.preventDefault();
       try {
           await signInWithPopup(auth, googleProvider);
-      } catch (error) {
+      } catch (error: any) {
           console.error("Error al iniciar sesión:", error);
+          alert("Login error: " + error.message);
       }
   };
 
@@ -180,6 +164,20 @@ export default function Home() {
         setReportData(data.result);
         setHistory(prev => [data.result, ...prev]); 
         
+        // 🚩 GUARDADO AUTOMÁTICO EN CUENTA 🚩
+        if (auth.currentUser) {
+            try {
+                // Guardar en: users -> [uid] -> analyses -> [documento]
+                await addDoc(collection(db, "users", auth.currentUser.uid, "analyses"), {
+                    ...data.result,
+                    createdAt: serverTimestamp() // Orden cronológico
+                });
+                console.log("Analysis saved to user account.");
+            } catch (saveError) {
+                console.error("Failed to save analysis to history:", saveError);
+            }
+        }
+
         setTutorialStep(2); 
         
       } else {
@@ -199,37 +197,37 @@ export default function Home() {
       
       <div className="absolute inset-0 z-0">
          <MapComponent 
-            onLocationSelect={handleStartAnalysis} 
-            mapType={mapType} 
-            interactionsDisabled={isMapDisabled} 
+           onLocationSelect={handleStartAnalysis} 
+           mapType={mapType} 
+           interactionsDisabled={isMapDisabled} 
          />
          
          {loading && <LoadingOverlay />}
 
          {!loading && (
              <TutorialGuide 
-                step={tutorialStep} 
-                setStep={setTutorialStep} 
-                onClose={() => setShowTutorial(false)} 
-                reportData={reportData}
-                isTour={showTutorial} 
+               step={tutorialStep} 
+               setStep={setTutorialStep} 
+               onClose={() => setShowTutorial(false)} 
+               reportData={reportData}
+               isTour={showTutorial} 
              />
          )}
 
          {reportData && !loading && !showHistoryList && (
              <AnalysisResultCard 
-                data={reportData} 
-                onClose={() => setReportData(null)}
+               data={reportData} 
+               onClose={() => setReportData(null)}
              />
          )}
 
          {showHistoryList && (
              <HistoryChat 
-                history={history} 
-                onClose={() => {
-                    setShowHistoryList(false);
-                    if (tutorialStep === 3) setShowTutorial(false);
-                }}
+               history={history} 
+               onClose={() => {
+                   setShowHistoryList(false);
+                   if (tutorialStep === 3) setShowTutorial(false);
+               }}
              />
          )}
 
@@ -265,7 +263,6 @@ export default function Home() {
                             {history.length > 0 && <span className="bg-blue-600 text-white text-[10px] px-1.5 rounded-full">{history.length}</span>}
                         </button>
 
-                         {/* --- D --- */}
                          <div className="border-b-2 border-slate-100">
                             {!user ? (
                                 <button 
@@ -273,7 +270,8 @@ export default function Home() {
                                     className={`w-full px-4 py-3 text-left text-sm font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-3 transition-colors`} 
                                 >
                                      <svg className="text-blue-600 fill-blue-600" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
-                                     <span>Sign in with Google</span>
+                                     {/* 🚩 TEXTO CAMBIADO A "Account" */}
+                                     <span>Account</span>
                                 </button>
                             ) : (
                                 <div className="px-4 py-3 bg-slate-50">
@@ -307,7 +305,7 @@ export default function Home() {
                             >
                                 <div className="flex items-center gap-3">
                                      <svg className="text-slate-400 fill-slate-400" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                                    <span>Settings</span>
+                                     <span>Settings</span>
                                 </div>
                                 <span className="text-[10px] text-slate-400">{showConfig ? '▲' : '▼'}</span>
                             </button>

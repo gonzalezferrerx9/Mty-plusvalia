@@ -39,13 +39,13 @@ export async function POST(req: NextRequest) {
 
     if (!response.ok) {
         console.error("TTS API FAIL:", data);
-        return NextResponse.json({ error: data.error?.message }, { status: 500 });
+        return NextResponse.json({ error: data.error?.message || 'TTS API failed' }, { status: 500 });
     }
 
     return NextResponse.json({ audioContent: data.audioContent });
 
   } catch (error: any) {
     console.error("TTS SERVER FAIL:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
