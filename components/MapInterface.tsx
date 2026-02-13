@@ -1,5 +1,9 @@
 "use client";
 
+// ====================================================================================================
+// IMPORTS AND DEPENDENCIES / IMPORTACIONES Y DEPENDENCIAS
+// ====================================================================================================
+
 import React, { useState, useEffect } from 'react';
 import {
   Map,
@@ -7,6 +11,12 @@ import {
   useMap,
   useMapsLibrary
 } from '@vis.gl/react-google-maps';
+import { auth } from '@/lib/firebase'; 
+
+// ====================================================================================================
+// EXTERNAL SERVICES AND UTILITIES / SERVICIOS Y UTILIDADES EXTERNAS
+// ====================================================================================================
+
 async function searchOSM(query: string) {
   try {
     const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`);
@@ -33,7 +43,10 @@ async function searchOSM(query: string) {
   }
 }
 
-// CONSTANTS
+// ====================================================================================================
+// CONSTANTS AND GLOBAL CONFIGURATION / CONSTANTES Y CONFIGURACIÓN GLOBAL
+// ====================================================================================================
+
 const MONTERREY_CENTER = { lat: 25.6866, lng: -100.3161 };
 const INITIAL_ZOOM = 11;
 const MONTERREY_BOUNDS = { 
@@ -42,13 +55,17 @@ const MONTERREY_BOUNDS = {
   west: -100.80, 
   east: -99.90 
 };
-const MAP_STYLES: any[] = [
-  { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] },
-  { featureType: "transit", elementType: "labels", stylers: [{ visibility: "off" }] }
-];
 
-// COMPONENTE INTERNO: Lógica de Interfaz y Mapa
+// ====================================================================================================
+// MAIN COMPONENT / COMPONENTE PRINCIPAL
+// ====================================================================================================
+
 export default function MapInterface() {
+  
+  // ====================================================================================================
+  // STATE MANAGEMENT AND INITIALIZATION / GESTIÓN DE ESTADO E INICIALIZACIÓN
+  // ====================================================================================================
+
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [selectedZone, setSelectedZone] = useState<any | null>(null);
   const [infoPosition, setInfoPosition] = useState<any | null>(null);
@@ -56,8 +73,15 @@ export default function MapInterface() {
   const [businessIdea, setBusinessIdea] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<any | null>(null);
+  
   const placesLib = useMapsLibrary('places');
   const map = useMap();
+
+  // ====================================================================================================
+  // BUSINESS LOGIC AND CONTROLLERS / LÓGICA DE NEGOCIO Y CONTROLADORES
+  // ====================================================================================================
 
   const handleSearchLocations = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,6 +91,7 @@ export default function MapInterface() {
     setRecommendations([]);
     setSelectedZone(null);
     setInfoPosition(null);
+    setAnalysisResult(null);
     
     if (map) {
         map.panTo(MONTERREY_CENTER);
@@ -80,12 +105,8 @@ export default function MapInterface() {
         body: JSON.stringify({ businessIdea }),
       });
       const data = await res.json();
-      
       if (!res.ok || data.error) throw new Error(data.error || "Error IA");
-      
-      if (data.locations) {
-        setRecommendations(data.locations);
-      }
+      if (data.locations) setRecommendations(data.locations);
     } catch (error: any) {
       alert(`⚠️ Error: ${error.message}`);
     } finally {
@@ -93,18 +114,41 @@ export default function MapInterface() {
     }
   };
 
+  const handleDeepAnalysis = async () => {
+    if (!selectedZone || !infoPosition) return;
+    
+    setIsAnalyzing(true);
+    try {
+      const res = await fetch('/api/analyze-plaza', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          position: infoPosition,
+          addressContext: selectedZone.name,
+          userId: auth.currentUser?.uid 
+        }),
+      });
+      const data = await res.json();
+      if (data.result) {
+        setAnalysisResult(data.result);
+        alert("✅ ¡Análisis guardado con éxito en tu cuenta!");
+      }
+    } catch (e) {
+      console.error("Error en análisis:", e);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   const handleSelectZone = async (zone: any) => {
     if (!map) return;
-
     setSelectedZone(zone);
     setInfoPosition(null); 
+    setAnalysisResult(null);
 
     let foundLocation = false;
-
-    // GOOGLE PLACES API 
     if (placesLib && placesLib.Place) {
         try {
-            // @ts-ignore
             const { places } = await placesLib.Place.searchByText({
                 textQuery: zone.search_query,
                 fields: ['location', 'viewport'],
@@ -126,7 +170,6 @@ export default function MapInterface() {
         }
     }
 
-    // FALLBACK 
     if (!foundLocation) {
         const osmData = await searchOSM(zone.search_query);
         if (osmData) {
@@ -139,15 +182,13 @@ export default function MapInterface() {
             foundLocation = true;
         }
     }
-
-    if (!foundLocation) {
-        alert(`No se pudo ubicar "${zone.name}" en el mapa.`);
-    }
   };
 
+  // ====================================================================================================
+  // USER INTERFACE RENDERING / RENDERIZADO DE INTERFAZ DE USUARIO
+  // ====================================================================================================
   return (
     <div className="w-full h-full relative flex">
-        {/* PANEL LATERAL */}
         <div className="absolute top-4 left-4 z-10 flex flex-col gap-2 max-h-[90vh]">
             <div className="w-80 bg-white p-2 rounded-lg shadow-lg border border-gray-200">
                 <form onSubmit={handleSearchLocations} className="flex gap-2 items-center">
@@ -197,27 +238,31 @@ export default function MapInterface() {
                             <h5 className="text-xs font-bold text-blue-800 uppercase mb-1">📍 Estrategia</h5>
                             <p className="text-xs text-gray-700 leading-relaxed">{selectedZone.reason}</p>
                         </div>
+                        <button 
+                          onClick={handleDeepAnalysis}
+                          disabled={isAnalyzing}
+                          className="w-full bg-blue-600 text-white py-2 rounded text-xs font-bold hover:bg-blue-700 transition-colors shadow-sm"
+                        >
+                          {isAnalyzing ? "Analizando con IA..." : "✨ Generar Análisis Financiero AI"}
+                        </button>
+
+                        {analysisResult && (
+                          <div className="bg-green-50 p-3 rounded-md border border-green-200 animate-in fade-in duration-500">
+                            <h5 className="text-xs font-bold text-green-800 uppercase mb-1">📈 Score de Inversión</h5>
+                            <p className="text-lg font-black text-green-700">{analysisResult.score}/100</p>
+                          </div>
+                        )}
+
                         {selectedZone.business_considerations && (
                             <div className="bg-purple-50 p-3 rounded-md">
                                 <h5 className="text-xs font-bold text-purple-800 uppercase mb-1">💸 Inversión & Operación</h5>
                                 <p className="text-xs text-gray-700 leading-relaxed">{selectedZone.business_considerations}</p>
                             </div>
                         )}
-                        {selectedZone.rent_estimate && (
-                            <div className="flex items-center gap-3 bg-green-50 p-3 rounded-md border border-green-100">
-                                <span className="text-xl">💰</span>
-                                <div>
-                                    <h5 className="text-xs font-bold text-green-800 uppercase">Renta Promedio</h5>
-                                    <p className="text-sm font-semibold text-gray-800">{selectedZone.rent_estimate}</p>
-                                </div>
-                            </div>
-                        )}
                     </div>
                 </div>
             )}
         </div>
-
-        {/* MAP */}
         <div className="flex-grow h-screen">
             <Map
                 defaultCenter={MONTERREY_CENTER}
@@ -226,7 +271,6 @@ export default function MapInterface() {
                 style={{ width: '100%', height: '100%' }}
                 gestureHandling={'greedy'}
                 disableDefaultUI={false}
-                // RESTRICTIONS
                 minZoom={10}
                 maxZoom={18}
                 restriction={{
@@ -234,7 +278,6 @@ export default function MapInterface() {
                     strictBounds: false
                 }}
             >
-
                 {infoPosition && (
                     <InfoWindow
                         position={infoPosition}

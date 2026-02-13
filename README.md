@@ -1,67 +1,65 @@
-# 🏙️ MTY PLUSVALÍA: AI Real Estate Investment Platform
+# 🏙️ M(T)Y PLUSVALÍA
 
-![Project Status](https://img.shields.io/badge/Status-Hackathon_Demo-orange)
-![Tech Stack](https://img.shields.io/badge/AI-Gemini_1.5_Flash-blue)
-![Platform](https://img.shields.io/badge/Platform-Next.js_Firebase-black)
-
-**MTY PLUSVALÍA** is an intelligent platform designed to democratize real estate investment analysis in the Monterrey metropolitan area. It leverages the power of **Gemini AI** and **Google Maps** to generate real-time financial, demographic, and commercial reports, guided by "Bricky," our voice-enabled AI agent.
+![IDE](https://img.shields.io/badge/IDE-Firebase_Studio-FF3D00?style=for-the-badge&logo=firebase&logoColor=white)
+![Infrastructure](https://img.shields.io/badge/Cloud_Infrastructure-Firebase-FF3D00?style=for-the-badge&logo=firebase&logoColor=white)
+![Services](https://img.shields.io/badge/Cloud_Services-Google_Cloud_Platform-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)
 
 ---
 
-## 🚀 About This Project
+## 📖 Description
 
-This project merges geospatial data with Generative AI to provide:
-* **🧠 Business Intelligence:** Profitable business type suggestions based on specific zone data.
-* **📊 Financial Projection:** Estimated ROI and cost per square meter calculations.
-* **🗺️ Geographic Context:** Competition and demographic assessment using Google Places.
-* **🗣️ Voice Interaction:** Audio reports narrated by AI (Text-to-Speech) for an immersive user experience.
+**M(T)Y PLUSVALÍA** is a geospatial web platform designed for **commercial real estate analysis potential**. Users can interact with a live map of the Monterrey metropolitan area to select any location, instantly triggering a multi-layered analysis powered by the **Gemini 3 Pro** model.
 
----
+### ⚡ Key Features:
+* 🏢 **Commercial Recommendations:** Suggesting the most profitable business types for the specific selected zone.
+* 💰 **Financial Projections:** Estimating **ROI** (Return on Investment) and average cost per square meter.
+* 📊 **Demographic & Competitive Insights:** Evaluating the neighborhood context using real-time data.
 
-## 🛠️ Technologies & Services (Google Stack)
+## 🛠️ Tech Stack Architecture
 
-This project was built by integrating the comprehensive Google Cloud and Firebase ecosystem:
+The project is built on a modern, robust stack centered around **Google’s ecosystem**, ensuring scalability, security, and high-performance AI integration.
 
-### **🧠 Artificial Intelligence (Core)**
-* **Gemini AI Agent ("Bricky"):** Natural language processing and real estate reasoning using the `Generative Language API`.
-* **Google AI Studio:** Prompt engineering and configuration of the `gemini-1.5-flash` model.
-* **Google Cloud Text-to-Speech API:** Neural voice generation for the AI assistant.
+### 💻 Core Framework & Frontend
+![Next JS](https://img.shields.io/badge/Next.js_15-black?style=for-the-badge&logo=next.js&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
-### **🌍 Google Maps Platform**
-* **Maps JavaScript API:** Interactive visualization and map rendering.
-* **Places API:** Extraction of points of interest and commercial competition data.
-* **Geocoding API:** Conversion of coordinates into readable addresses.
+* **Core Framework:** **Next.js 15 (Full-stack)**. Utilizing its hybrid architecture to manage both the responsive UI (React) and the secure server-side logic (API Routes).
+* **Language:** **TypeScript**. Ensuring type safety and code reliability.
+* **Styling:** **Tailwind CSS**. For rapid, utility-first styling and responsive design.
 
-### **🔥 Infrastructure (Firebase)**
-* **Firebase Hosting:** Web application deployment (Next.js).
-* **Cloud Functions (2nd Gen):** Serverless backend to securely orchestrate Gemini and TTS API calls.
-* **Firebase Authentication:** User management (Google Sign-In).
-* **Firebase Console:** Project and domain management.
+### 🧠 Artificial Intelligence (AI)
+![Gemini 3](https://img.shields.io/badge/Gemini_3_Pro-8E24AA?style=for-the-badge&logo=googlegemini&logoColor=white)
+![Firebase Agent](https://img.shields.io/badge/Firebase_Agent-FF3D00?style=for-the-badge&logo=firebase&logoColor=white)
 
----
+* **AI Engine:** **Gemini 3 Pro Preview**. The core intelligence driving the financial and geospatial analysis.
+* **AI Development:** **Firebase Studio’s Gemini AI Agent**. Used for accelerating development workflows and code generation.
 
-## 🚧 Development Status (Important Notice)
+### ☁️ Google Cloud Platform (GCP)
+![Google Maps](https://img.shields.io/badge/Google_Maps-4285F4?style=for-the-badge&logo=google-maps&logoColor=white)
+![APIs](https://img.shields.io/badge/Google_Cloud_APIs-4285F4?style=for-the-badge&logo=google-cloud&logoColor=white)
 
-> **⚠️ Note regarding Authentication:**
-> The **Create Account / Sign In** functionality (Firebase Auth) is currently in **BETA**.
-> * The system allows for basic authentication, but features such as profile persistence and report history saving are under active development for post-hackathon versions.
-> * The core access to map analysis and the AI agent is **fully enabled** for demonstration purposes.
+Leveraging the power of GCP for geospatial intelligence and user interaction:
+* **Maps JavaScript API** (Interactive Map)
+* **Places API** (Location Data)
+* **Geocoding API** (Coordinates & Addresses)
+* **Generative Language API** (AI Connection)
+* **Identity Toolkit API** (Authentication Handling)
+* **Cloud Text-to-Speech API** (Voice Feedback)
 
----
+### 🔥 Cloud Infrastructure (Firebase)
+![Firebase](https://img.shields.io/badge/Firebase_Hosting-FF3D00?style=for-the-badge&logo=firebase&logoColor=white)
+![Firestore](https://img.shields.io/badge/Cloud_Firestore-FF3D00?style=for-the-badge&logo=firebase&logoColor=white)
+![Auth](https://img.shields.io/badge/Firebase_Auth-FF3D00?style=for-the-badge&logo=firebase&logoColor=white)
 
-## ⚙️ Configuration & Installation
+* **Cloud Infrastructure:**
+    * **Firestore:** NoSQL database for real-time data storage (User history & analyses).
+    * **Firebase Hosting:** Fast and secure global content delivery.
+    * **Firebase Auth:** Secure user authentication system.
 
-Follow these steps to run the project locally:
+  ---
 
-### 1. Prerequisites
-* Node.js 18+ installed.
-* Google Cloud account with billing enabled (for Maps & Gemini APIs).
-* Firebase CLI installed (`npm install -g firebase-tools`).
+## 🎥 Live Demo & Walkthrough
 
-### 2. Installation
-Clone the repository and install dependencies:
-
-```bash
-git clone [https://github.com/your-username/mty-plusvalia.git](https://github.com/your-username/mty-plusvalia.git)
-cd mty-plusvalia
-npm install
+[![MTY Plusvalía Demo](https://img.youtube.com/vi/rOx1ychFttU/0.jpg)](https://youtu.be/rOx1ychFttU)

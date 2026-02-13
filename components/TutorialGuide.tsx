@@ -15,7 +15,7 @@ const TutorialGuide: React.FC<TutorialGuideProps> = ({ step, setStep, onClose, r
   const [showAnalysisText, setShowAnalysisText] = useState(false);
   const [analysisFinished, setAnalysisFinished] = useState(false); 
   
-  // 🚩 WELCOME
+  // WELCOME
   const [introFinished, setIntroFinished] = useState(false);
 
   // STOP WELCOME
@@ -35,7 +35,7 @@ const TutorialGuide: React.FC<TutorialGuideProps> = ({ step, setStep, onClose, r
   };
   
   let analysisBody = "";
-  let analysisClosing = "And that's it! Here is your full report. Now click Continue to see how the platform menu works.";
+  let analysisClosing = "And that's it! Here's your report in just a couple of minutes instead of a couple of hours. Now click Continue to see how the platform menu works.";
 
   if (reportData) {
       const zone = reportData.zona_nombre || "the selected area";
@@ -60,25 +60,25 @@ const TutorialGuide: React.FC<TutorialGuideProps> = ({ step, setStep, onClose, r
       {
           title: "Hello! Welcome",
           desc: "I'm your real estate AI expert. Welcome to Mty Plusvalia platform, here you will find the best investment opportunities in Monterrey metropolitan area.",
-          spokenText: "Hello! I'm Bricky, your real estate AI expert. Welcome to MTY PLUSVALÍA platform, here you will find the best investment opportunities in Monterrey metropolitan area . To start, click the blue button.",
+          spokenText: "Hello! I'm Bricky, your real estate AI expert. Welcome to Mty Plusvalia platform, here you will find the best investment opportunities in Monterrey metropolitan area . To start, click the blue button.",
           buttonText: "Start"
       },
       {
           title: "1. Explore the Map",
           desc: "Navigate through the city. Click on any point you want to investigate so I can perform my analysis. Avoid uninhabitable zones like highways or protected natural areas.",
+          spokenText: "Navigate through the city. Click on any point you want to investigate so I can perform my analysis. Avoid uninhabitable zones like highways or protected natural areas.", 
           buttonText: null 
       },
       {
           title: "2. Full Analysis",
           desc: analysisClosing, 
-          spokenText: "", 
-          buttonText: analysisFinished ? "Continue" : null 
+          spokenText: "And there you have it. The information needed in just a couple of minutes instead of a couple of hours of your valuable time.", 
+          buttonText: "Continue" // El botón siempre dice "Continue", su visibilidad depende de analysisFinished
       },
       {
           title: "3. Menu Tour",
-          desc: "In the MTY PLUSVALÍA button, you'll find the platform menu. You can check your saved analyses, manage your account, or change settings. If you need this tutorial again, you can find me in the Settings section.",
-          spokenText: "In the MTY PLUSVALÍA button, you will find the platform menu. There, you can consult your saved reports and modify your settings. If you ever need this interactive tutorial again, you can find me in the Settings section.",
-          buttonText: "Got it"
+          desc: "In the MTY PLUSVALÍA button, you'll find the platform menu. You can check your saved analyses, create your account via Google or change settings. If you need this tutorial again, you can find me in the Settings section.",
+          spokenText: "In the MTY PLUSVALÍA button, you'll find the platform menu. You can check your saved analyses, create your account via Google or change settings. If you need this tutorial again, you can find me in the Settings section.",
       }
   ];
 
@@ -238,9 +238,10 @@ const TutorialGuide: React.FC<TutorialGuideProps> = ({ step, setStep, onClose, r
                         setTimeout(() => setStep(4), 1000); 
                     }
                  }
-                 setShowAnalysisText(true);
                  if (isTour) await speak(analysisClosing);
+                 
                  setAnalysisFinished(true); 
+                 setShowAnalysisText(true); 
              }
          } else if (currentStep) {
              const textToSpeak = (currentStep as any)?.spokenText || currentStep?.desc;
@@ -292,13 +293,12 @@ const TutorialGuide: React.FC<TutorialGuideProps> = ({ step, setStep, onClose, r
   
   const isResultShown = step === 2; 
   const isChatMode = step === 3; 
-  
-  // LÓGIC
+  const isBubbleVisible = !!currentStep && (isResultShown ? (isTour && analysisFinished) : true);
+
   const showButton = isWelcome 
         ? introFinished 
-        : (currentStep && currentStep.buttonText && (!isSpeaking || step === 2 || step === 3));
+        : (currentStep && currentStep.buttonText && (!isSpeaking || (isResultShown && analysisFinished) || isChatMode));
 
-  const isBubbleVisible = !!currentStep && (step === 2 ? isTour : true);
   const showDescription = isBubbleVisible;
   const displayStep = step;
 
@@ -362,7 +362,6 @@ const TutorialGuide: React.FC<TutorialGuideProps> = ({ step, setStep, onClose, r
             </svg>
             <div className="absolute bottom-12 -right-6 w-12 h-1 bg-slate-900 rotate-[-45deg] z-20 animate-arm-pointing origin-bottom-left rounded-full shadow-sm"></div>
           </div>
-
           <div className={`
                 pointer-events-auto bg-white border-l-2 border-t-2 border-r-[8px] border-b-[8px] border-slate-900 
                 p-4 rounded-2xl relative transition-all duration-500

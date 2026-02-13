@@ -11,8 +11,6 @@ import {
 const MONTERREY_CENTER = { lat: 25.6866, lng: -100.3161 };
 const INITIAL_ZOOM = 12;
 const MONTERREY_BOUNDS = { north: 25.85, south: 25.50, west: -100.60, east: -100.05 };
-
-// COMPONENTE INTERNO PARA MANEJAR EVENTOS DEL MAPA
 const MapEvents = () => {
     const map = useMap();
     
@@ -40,7 +38,7 @@ const MapEvents = () => {
 interface MapContentProps {
     onMapClick: (lat: number, lng: number, address: string) => void;
     mapType: string;
-    interactionsDisabled?: boolean; // Prop to disable interactions
+    interactionsDisabled?: boolean; 
 }
 
 const MapContent = ({ onMapClick, mapType, interactionsDisabled = false }: MapContentProps) => {
@@ -63,7 +61,7 @@ const MapContent = ({ onMapClick, mapType, interactionsDisabled = false }: MapCo
   }, [geocodingLib]);
 
   const handleClick = async (ev: any) => {
-    if (interactionsDisabled) return; // Prevent click if disabled
+    if (interactionsDisabled) return; 
 
     if (!ev.detail.latLng) return;
     const lat = ev.detail.latLng.lat;
@@ -89,7 +87,7 @@ const MapContent = ({ onMapClick, mapType, interactionsDisabled = false }: MapCo
       defaultZoom={INITIAL_ZOOM}
       mapId={process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID || "DEMO_MAP_ID"}
       style={{ width: '100%', height: '100%' }}
-      gestureHandling={interactionsDisabled ? 'none' : 'greedy'} // Disable gestures if interaction disabled
+      gestureHandling={interactionsDisabled ? 'none' : 'greedy'}
       disableDefaultUI={true} 
       mapTypeId={mapType} 
       onClick={handleClick}

@@ -1,5 +1,9 @@
 "use client";
 
+// =================================================================================================
+// IMPORTS AND CONFIGURATION / IMPORTACIONES Y CONFIGURACIÓN
+// =================================================================================================
+
 import React, { useState, useEffect } from 'react';
 import MapComponent from '../components/MapComponent';
 import TutorialGuide from '../components/TutorialGuide';
@@ -10,7 +14,9 @@ import { auth, googleProvider, db } from '../lib/firebase'; // 🚩 Agregamos db
 import { signInWithPopup, signOut, onAuthStateChanged, User } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; // 🚩 Para guardar
 
-// --- UI COMPONENTS (LoadingOverlay y AnalysisResultCard se mantienen igual) ---
+// =================================================================================================
+// USER INTERFACE / INTERFAZ DE USUARIO
+// =================================================================================================
 const LoadingOverlay = () => (
   <div className="absolute inset-0 z-50 bg-black/40 backdrop-blur-sm flex flex-col items-center justify-center text-white animate-in fade-in duration-300">
     <div className="bg-white/10 p-6 rounded-2xl border-l-4 border-t-4 border-r-[8px] border-b-[8px] border-white/20 backdrop-blur-md flex flex-col items-center">
@@ -82,8 +88,8 @@ const AnalysisResultCard = ({ data, onClose }: { data: any, onClose: () => void 
             </div>
             <div className="border-t-2 border-slate-100 pt-4 text-center">
                  <p className="text-[9px] text-slate-400 font-mono tracking-tight">
-                    Google Cloud Architect Project • Powered by Gemini <br/>
-                    <span className="text-[8px] opacity-70">Gemini can make mistakes, so verify the information.</span>
+                     • Powered by Gemini • <br/>
+                    <span className="text-[8px] opacity-70">Gemini can make mistakes, verify the information.</span>
                  </p>
             </div>
         </div>
@@ -91,7 +97,9 @@ const AnalysisResultCard = ({ data, onClose }: { data: any, onClose: () => void 
   );
 };
 
-// --- MAIN PAGE ---
+// =================================================================================================
+// MAIN LOGIC OF THE PAGE /  LÓGICA PRINCIPAL DE LA PÁGINA
+// =================================================================================================
 
 export default function Home() {
   const [reportData, setReportData] = useState<any>(null);
@@ -164,13 +172,11 @@ export default function Home() {
         setReportData(data.result);
         setHistory(prev => [data.result, ...prev]); 
         
-        // 🚩 GUARDADO AUTOMÁTICO EN CUENTA 🚩
         if (auth.currentUser) {
             try {
-                // Guardar en: users -> [uid] -> analyses -> [documento]
                 await addDoc(collection(db, "users", auth.currentUser.uid, "analyses"), {
                     ...data.result,
-                    createdAt: serverTimestamp() // Orden cronológico
+                    createdAt: serverTimestamp() 
                 });
                 console.log("Analysis saved to user account.");
             } catch (saveError) {
@@ -192,6 +198,9 @@ export default function Home() {
 
   const isMapDisabled = !!reportData || isMenuOpen || showHistoryList;
 
+// =================================================================================================
+// RENDERING AND VISUAL INTERFACE / RENDERIZADO E INTERFAZ VISUAL
+// =================================================================================================
   return (
     <main className="h-screen w-full bg-slate-900 relative overflow-hidden font-sans text-slate-900">
       

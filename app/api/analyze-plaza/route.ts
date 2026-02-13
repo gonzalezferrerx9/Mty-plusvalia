@@ -1,16 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { db } from '@/lib/firebase'; 
+import { collection, addDoc } from 'firebase/firestore'; 
+
+// ====================================================================================================
+// POST REQUEST CONTROLLER / CONTROLADOR DE PETICIÓN POST
+// ====================================================================================================
 
 export async function POST(req: NextRequest) {
   try {
+    // ====================================================================================================
+    // GEMINI CONFIGURATION / CONFIGURACIÓN DE GEMINI
+    // ====================================================================================================
     const body = await req.json();
-    const { position, addressContext } = body;
+    
+    const { position, addressContext, userId } = body; 
 
-    // --- GEMINI CONFIGURATION ---
-    const API_KEY = "AIzaSyBQE3iegD2MSQci6epTZK2ZgbxUoHgi3nA";
+    // Credentials / Credenciales
+    const API_KEY = "YOUR_GEMINI_API_KEY_HERE";
     const MODEL_ID = "gemini-3-pro-preview";
 
     const locationText = addressContext || `${position.lat}, ${position.lng}`;
 
+    // ====================================================================================================
+    // CONTENT GENERATION ENGINE (AI) / MOTOR DE GENERACIÓN DE CONTENIDO (IA)
+    // ====================================================================================================
+    
+    // JSON
     const prompt = `
       You are an Expert Real Estate Investment Consultant.
       Analyze the location: ${locationText}.
@@ -42,6 +57,7 @@ export async function POST(req: NextRequest) {
       }
     `;
 
+    // Gemini API
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_ID}:generateContent?key=${API_KEY}`;
 
     const response = await fetch(url, {
@@ -56,6 +72,10 @@ export async function POST(req: NextRequest) {
         })
     });
 
+    // ====================================================================================================
+    // RESPONSE PROCESSING AND VALIDATION / PROCESAMIENTO Y VALIDACIÓN DE RESPUESTA
+    // ====================================================================================================
+
     const data = await response.json();
 
     if (data.error) {
@@ -68,7 +88,26 @@ export async function POST(req: NextRequest) {
         throw new Error("No response from Gemini.");
     }
 
-    return NextResponse.json({ result: JSON.parse(resultText) });
+    const result = JSON.parse(resultText);
+
+
+    // ====================================================================================================
+    // DATA PERSISTENCE LAYER / CAPA DE PERSISTENCIA DE DATOS 
+    // ====================================================================================================
+    
+    if (userId) {
+      await addDoc(collection(db, "analyses"), {
+        userId: userId,
+        ...result,
+        createdAt: new Date().toISOString()
+      });
+    }
+
+    // ====================================================================================================
+    // CUSTOMER RESPONSE / RESPUESTA AL CLIENTE
+    // ====================================================================================================
+    
+    return NextResponse.json({ result });
 
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

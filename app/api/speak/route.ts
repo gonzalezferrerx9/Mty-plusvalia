@@ -1,20 +1,33 @@
+// ==========================================================================================
+// IMPORTS / IMPORTACIONES
+// ==========================================================================================
+
 import { NextRequest, NextResponse } from 'next/server';
+
+// ==========================================================================================
+// POST
+// ==========================================================================================
 
 export async function POST(req: NextRequest) {
   try {
+    // API
     const { text } = await req.json();
     
-    const apiKey = process.env.GOOGLE_API_KEY || 
+    const API_KEY = "YOUR_GOOGLE_CLOUD_API_KEY_HERE";
                    process.env.GEMINI_API_KEY || 
                    process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
-    if (!apiKey) {
-      return NextResponse.json({ error: 'API Key Missing' }, { status: 500 });
-    }
+                   if (!API_KEY || API_KEY === "YOUR_GOOGLE_CLOUD_API_KEY_HERE") {
+                    console.error("API Key is missing or not configured.");
+                    return NextResponse.json({ error: 'API Key Missing. Please configure lib/firebase.ts or api/speak/route.ts' }, { status: 500 });
+                  }
 
-    const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`;
+    const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${API_KEY}`;
     
-    // VOICE
+ // ==========================================================================================
+    // 2. VOICE CONFIGURATION (BRICKY) / CONFIGURACIÓN DE VOZ (BRICKY)
+ // ==========================================================================================
+
     const body = {
       input: { text },
       voice: { 
@@ -28,6 +41,10 @@ export async function POST(req: NextRequest) {
         speakingRate: 1.05
       }
     };
+
+ // ==========================================================================================
+    // API REQUEST / PETICIÓN A LA API
+ // ==========================================================================================
 
     const response = await fetch(url, {
       method: 'POST',
