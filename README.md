@@ -8,7 +8,7 @@
 
 ## 📖 Description
 
-**M(T)Y PLUSVALÍA** is a geospatial web platform designed for **commercial real estate analysis potential**. Users can interact with a live map of the Monterrey metropolitan area to select any location, instantly triggering a multi-layered analysis powered by the **Gemini 3 Pro** model.
+**M(T)Y PLUSVALÍA** is a geospatial web platform designed for **commercial real estate analysis potential**. Users can interact with a live map of the Monterrey metropolitan area to select any location, instantly triggering a multi-layered analysis powered by the **Gemini 3 Pro-preview** model.
 
 ### ⚡ Key Features:
 * 🏢 **Commercial Recommendations:** Suggesting the most profitable business types for the specific selected zone.
@@ -30,35 +30,37 @@ The project is built on a modern, robust stack centered around **Google’s ecos
 * **Styling:** **Tailwind CSS**. For rapid, utility-first styling and responsive design.
 
 ### 🧠 Artificial Intelligence (AI)
-![Gemini 3](https://img.shields.io/badge/Gemini_3_Pro-8E24AA?style=for-the-badge&logo=googlegemini&logoColor=white)
+![Gemini](https://img.shields.io/badge/Gemini-4285F4?style=for-the-badge&logo=googlegemini&logoColor=white)
 ![Firebase Agent](https://img.shields.io/badge/Firebase_Agent-FF3D00?style=for-the-badge&logo=firebase&logoColor=white)
 
-* **AI Engine:** **Gemini 3 Pro Preview**. The core intelligence driving the financial and geospatial analysis.
-* **AI Development:** **Firebase Studio’s Gemini AI Agent**. Used for accelerating development workflows and code generation.
+* **AI Engine:** **Gemini 3 Pro-preview**. The core intelligence driving the financial and geospatial analysis.
+* **AI Development:** **Firebase Studio’s Gemini AI Agent (Gemini 3 Pro-preview)**. Used for accelerating development workflows and code generation.
 
-### ☁️ Google Cloud Platform (GCP)
-![Google Maps](https://img.shields.io/badge/Google_Maps-4285F4?style=for-the-badge&logo=google-maps&logoColor=white)
-![APIs](https://img.shields.io/badge/Google_Cloud_APIs-4285F4?style=for-the-badge&logo=google-cloud&logoColor=white)
+### ☁️ Cloud Services
+![Google Cloud Platform](https://img.shields.io/badge/Google_Cloud_Platform-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)
 
-Leveraging the power of GCP for geospatial intelligence and user interaction:
-* **Maps JavaScript API** (Interactive Map)
-* **Places API** (Location Data)
-* **Geocoding API** (Coordinates & Addresses)
-* **Generative Language API** (AI Connection)
-* **Identity Toolkit API** (Authentication Handling)
-* **Cloud Text-to-Speech API** (Voice Feedback)
+* **Google Maps Platform**
+  * **Maps JavaScript API:** Interactive Map.
+  * **Places API:** Location Data.
+  * **Geocoding API:** Coordinates & Addresses.
+* **Generative Language API:** AI Connection.
+* **Identity Platform:** Authentication Handling.
+* **Cloud Text-to-Speech API:** Voice Feedback.
 
-### 🔥 Cloud Infrastructure (Firebase)
-![Firebase](https://img.shields.io/badge/Firebase_Hosting-FF3D00?style=for-the-badge&logo=firebase&logoColor=white)
-![Firestore](https://img.shields.io/badge/Cloud_Firestore-FF3D00?style=for-the-badge&logo=firebase&logoColor=white)
-![Auth](https://img.shields.io/badge/Firebase_Auth-FF3D00?style=for-the-badge&logo=firebase&logoColor=white)
+### ☁️ Cloud Infrastructure
+![Firebase](https://img.shields.io/badge/Firebase-FF3D00?style=for-the-badge&logo=firebase&logoColor=white)
 
-* **Cloud Infrastructure:**
-    * **Firestore:** NoSQL database for real-time data storage (User history & analyses).
-    * **Firebase Hosting:** Fast and secure global content delivery.
-    * **Firebase Auth:** Secure user authentication system.
+* **Firestore:** NoSQL database for real-time data storage (User history & analyses).
+* **Firebase Hosting:** Fast and secure global content delivery.
+* **Firebase Auth:** Secure user authentication system.
 
-  ---
+---
+
+## 💵 Budget
+
+* $300 USD Google Cloud Credits
+
+---
 
 ## 🎥 Live Demo & Walkthrough
 
